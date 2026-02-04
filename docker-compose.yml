@@ -1,34 +1,26 @@
-#version: '3.8'
-
 services:
-
   postgres:
-    container_name: postgres
-    image: postgres:13
-    volumes:
-      - postgres_volume:/var/lib/postgresql/data
+    image: postgres:16-alpine
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
     ports:
       - 5432:5432
-
-  adonis_app:
-    container_name: adonis_app
-    restart: always
-    build: 
-      context: .
-      target: dependencies
-    ports:
-      - ${PORT}:${PORT}
-      - 9229:9229
-    env_file:
-      - .env
     volumes:
-      - ./:/home/node/app
-      # If developping on MacOS : Uncomment the line bellow
-      #- /home/node/app/node_modules
-    command: dumb-init node ace serve --watch --node-args="--inspect=0.0.0.0"
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: ./backend
+    ports:
+      - 3333:3333
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
 
 volumes:
-  postgres_volume:
+  postgres_data:
