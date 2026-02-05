@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-RUN apk --no-cache add dumb-init
+RUN apk --no-cache add dumb-init netcat-openbsd
 
 WORKDIR /app
 
@@ -9,6 +9,8 @@ RUN npm ci
 
 COPY . .
 
+RUN chmod +x entrypoint.sh
+
 EXPOSE 3333
 
-CMD ["dumb-init", "node", "ace", "serve", "--watch"]
+CMD ["dumb-init", "./entrypoint.sh"]
