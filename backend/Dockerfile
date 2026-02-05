@@ -13,4 +13,4 @@ RUN chmod +x entrypoint.sh
 
 EXPOSE 3333
 
-CMD ["dumb-init", "./entrypoint.sh"]
+CMD ["dumb-init", "sh", "entrypoint.sh"]

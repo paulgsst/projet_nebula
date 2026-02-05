@@ -4,6 +4,8 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import Zone from './zone.js'
 
 export default class Equipment extends BaseModel {
+  static table = 'equipments'
+
   @column({ isPrimary: true })
   declare id: number
 
