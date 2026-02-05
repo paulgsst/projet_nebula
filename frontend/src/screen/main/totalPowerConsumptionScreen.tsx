@@ -23,7 +23,7 @@ export function TotalPowerConsumptionScreen(){
     const radius = size / 2 - 25;
     const circumference = 2 * Math.PI * radius;
     const strokeDasharray = circumference;
-    const strokeDashoffset = circumference - (value / 100) * circumference;
+    const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
     return (
       <div className="flex items-center justify-center">
@@ -68,7 +68,7 @@ export function TotalPowerConsumptionScreen(){
               strokeWidth="18"
               fill="transparent"
               strokeDasharray={strokeDasharray}
-              strokeDashoffset={strokeDashoffset              }
+              strokeDashoffset={strokeDashoffset}
               strokeLinecap="round"
               className="transition-all duration-1000 ease-out"
               filter="url(#glow)"
