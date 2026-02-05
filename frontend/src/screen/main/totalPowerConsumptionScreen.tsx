@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 
-export function TotalPowerConsumptionScreen(){
+function TotalPowerConsumptionScreen({ sizeScreen }: { sizeScreen: number }) {
 
     const currentPowerConsumption = 1500; 
     const maxPowerConsumption = 5000;
@@ -23,7 +23,7 @@ export function TotalPowerConsumptionScreen(){
     const radius = size / 2 - 25;
     const circumference = 2 * Math.PI * radius;
     const strokeDasharray = circumference;
-    const strokeDashoffset = circumference - (percentage / 100) * circumference;
+    const strokeDashoffset = circumference - (percentage / 100 ) * circumference;
 
     return (
       <div className="flex items-center justify-center">
@@ -38,10 +38,10 @@ export function TotalPowerConsumptionScreen(){
                 </feMerge>
               </filter>
               <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#3efa00" />
+                <stop offset="0%" stopColor="#facc00" />
                 <stop offset="30%" stopColor="#facc00" />
-                <stop offset="70%" stopColor="#d14d00" />
-                <stop offset="100%" stopColor="#d11500" />
+                <stop offset="50%" stopColor="#facc00" />
+                <stop offset="100%" stopColor="#facc00" />
               </linearGradient>
               <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="rgba(59, 130, 246, 0.1)" />
@@ -71,16 +71,13 @@ export function TotalPowerConsumptionScreen(){
               strokeDashoffset={strokeDashoffset}
               strokeLinecap="round"
               className="transition-all duration-1000 ease-out"
-              filter="url(#glow)"
-              style={{
-                filter: 'drop-shadow(0 0 20px rgba(59, 130, 246, 0.6))',
-              }}
+
             />
           </svg>
           
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
-              <div className="text-6xl font-bold text-gray-900 mb-3 drop-shadow-sm">
+              <div className="text-6xl font-bold text-gray-500 mb-3 drop-shadow-sm">
                 {value*100/maxPowerConsumption}%
               </div>
               <div className="text-sm font-semibold text-yellow-400 uppercase tracking-widest mb-2">
@@ -101,13 +98,8 @@ export function TotalPowerConsumptionScreen(){
 
 
     return(
-        <div>
-        <div className="relative animate-pulse">
-            <div className="rounded-[20px] bg-yellow-500 p-4 shadow-md flex">
-                Total Power Consumption: 1500W
-            </div>
-        </div>
-        <CircularGauge value={currentPowerConsumption} size={350} />
-        </div>
+        <CircularGauge value={currentPowerConsumption} size={sizeScreen} />
     );
 }
+
+export { TotalPowerConsumptionScreen };
