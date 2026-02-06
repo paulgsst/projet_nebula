@@ -18,6 +18,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from './../card/card';
 import { Badge } from './../../ui/badge';
 import { Progress } from './../../ui/progress';
+import SettingMenuScreen from '../settingMenu/settingMenuScreen';
 
 export default function MainScreen() {
   // Mock data for demonstration
@@ -365,9 +366,11 @@ export default function MainScreen() {
               <Bell className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">2</span>
             </button>
-            <button className="p-3 text-white hover:text-yellow-500 transition-colors rounded-full hover:bg-yellow-50">
+            
+            <SettingMenuScreen />
+            {/*<button className="p-3 text-white hover:text-yellow-500 transition-colors rounded-full hover:bg-yellow-50">
               <Settings className="w-5 h-5" />
-            </button>
+            </button> */}
             <div className="flex items-center space-x-3 pl-4 border-l border-gray-200">
               <div className="text-right hidden sm:block">
                 <div className="text-sm font-semibold text-gray-900">Idris Ogundele Olawale</div>
