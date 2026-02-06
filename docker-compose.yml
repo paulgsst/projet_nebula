@@ -35,6 +35,7 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-
+    environment:
+      - CHOKIDAR_USEPOLLING=true
 volumes:
   postgres_data:
