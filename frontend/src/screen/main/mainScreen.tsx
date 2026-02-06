@@ -336,7 +336,7 @@ export default function MainScreen() {
 
       {/* Enhanced Header Bar */}
       <header 
-        className="backdrop-blur-md border-b border-white/20 px-4 sm:px-6 py-5 relative z-10"
+        className="backdrop-blur-md border-b border-white/20 px-4 sm:px-6 py-5 relative z-10 overflow-visible"
         style={{
           background: 'rgba(255, 255, 255, 0.9)',
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
