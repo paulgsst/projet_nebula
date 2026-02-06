@@ -37,16 +37,16 @@ export default function SettingMenuScreen() {
         <div className="relative flex flex-col items-center z-50" ref={menuRef} >
             <button
             onClick={() => setIsOpen(!isOpen)} 
-            className="p-3 text-white hover:text-yellow-500 transition-colors rounded-full hover:bg-yellow-50">
+            className="p-3 text-gray-600 hover:text-yellow-500 transition-colors rounded-full hover:bg-yellow-50">
               <Settings className="w-5 h-5" />
             </button>
 
             {isOpen && (
-                <div className="absolute top-full mt-2 bg-gray-200 pl-5 pr-5 rounded-2xl shadow-lg border z-50" >
-                    <ul className="py-2">
-                        <li className="text-black p-1 rounded hover:bg-gray-500 cursor-pointer">Profile</li>
-                        <li className="text-black p-1 rounded hover:bg-gray-500 cursor-pointer">Settings</li>
-                        <li className="text-black p-1 rounded hover:bg-gray-500 cursor-pointer">Logout</li>
+                <div className="absolute top-full right-0 mt-2 min-w-[160px] bg-white px-2 py-2 rounded-xl shadow-xl border border-gray-200 z-[9999]" >
+                    <ul className="space-y-1">
+                        <li className="text-gray-900 px-3 py-2 rounded-lg hover:bg-yellow-50 cursor-pointer transition-colors">Profile</li>
+                        <li className="text-gray-900 px-3 py-2 rounded-lg hover:bg-yellow-50 cursor-pointer transition-colors">Settings</li>
+                        <li className="text-gray-900 px-3 py-2 rounded-lg hover:bg-red-50 hover:text-red-600 cursor-pointer transition-colors">Logout</li>
                     </ul>
                 </div>)
                 }

@@ -336,7 +336,7 @@ export default function MainScreen() {
 
       {/* Enhanced Header Bar */}
       <header 
-        className="backdrop-blur-md border-b border-white/20 px-4 sm:px-6 py-5 relative z-10"
+        className="backdrop-blur-md border-b border-white/20 px-4 sm:px-6 py-5 relative z-50 overflow-visible"
         style={{
           background: 'rgba(255, 255, 255, 0.9)',
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
@@ -362,7 +362,7 @@ export default function MainScreen() {
           
           {/* Right side - Profile, notifications, and user info */}
           <div className="flex items-center space-x-4">
-            <button className="relative p-3 text-white hover:text-yellow-500 transition-colors rounded-full hover:bg-yellow-50">
+            <button className="relative p-3 text-gray-600 hover:text-yellow-500 transition-colors rounded-full hover:bg-yellow-50">
               <Bell className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">2</span>
             </button>
