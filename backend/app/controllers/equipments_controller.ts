@@ -33,4 +33,20 @@ export default class EquipmentsController {
 
     return response.ok(equipment)
   }
+
+  /**
+   * Toggle l'état actif/inactif d'un équipement
+   */
+  async toggle({ params, response }: HttpContext) {
+    const equipment = await Equipment.find(params.id)
+
+    if (!equipment) {
+      return response.notFound({ message: 'Equipment not found' })
+    }
+
+    equipment.isActive = !equipment.isActive
+    await equipment.save()
+
+    return response.ok(equipment)
+  }
 }

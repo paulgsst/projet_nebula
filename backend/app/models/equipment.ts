@@ -27,6 +27,9 @@ export default class Equipment extends BaseModel {
   @column()
   declare currentConsumptionMw: number
 
+  @column()
+  declare isActive: boolean
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

@@ -18,7 +18,8 @@ import {
   MapPin,
   ChevronDown,
   ChevronUp,
-  Cpu
+  Cpu,
+  Power
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './../card/card';
 import { Badge } from './../../ui/badge';
@@ -39,6 +40,7 @@ interface EquipmentData {
   capacityMaxMw: number;
   importanceWeight: number;
   currentConsumptionMw: number;
+  isActive: boolean;
 }
 
 interface ZoneData {
@@ -117,7 +119,27 @@ export default function MainScreen() {
   const selectedZone = zones.find((z) => z.id === selectedZoneId) || null;
 
   const getZoneConsumption = (zone: ZoneData) =>
-    zone.equipments.reduce((sum, eq) => sum + Number(eq.currentConsumptionMw), 0);
+    zone.equipments.reduce((sum, eq) => eq.isActive ? sum + Number(eq.currentConsumptionMw) : sum, 0);
+
+  const toggleEquipment = async (equipmentId: number) => {
+    try {
+      const res = await fetch(`http://localhost:3333/equipments/${equipmentId}/toggle`, {
+        method: 'PATCH',
+      });
+      if (!res.ok) return;
+      const updated: EquipmentData = await res.json();
+      setZones((prev) =>
+        prev.map((zone) => ({
+          ...zone,
+          equipments: zone.equipments.map((eq) =>
+            eq.id === equipmentId ? { ...eq, isActive: updated.isActive } : eq
+          ),
+        }))
+      );
+    } catch (err) {
+      console.error('Failed to toggle equipment', err);
+    }
+  };
 
   const getZonePercentage = (zone: ZoneData) => {
     if (zone.capacityMaxMw === 0) return 0;
@@ -692,26 +714,43 @@ export default function MainScreen() {
                     ) : (
                       <div className="space-y-3">
                         {selectedZone.equipments.map((eq) => {
-                          const eqPercentage = getEquipmentPercentage(eq);
+                          const isDisabled = !eq.isActive;
+                          const eqPercentage = isDisabled ? 0 : getEquipmentPercentage(eq);
                           const eqColor = getZoneColor(eqPercentage);
                           return (
                             <div
                               key={eq.id}
-                              className="flex items-center p-4 rounded-lg glassmorphism shadow-sm border border-white/20"
+                              className={`flex items-center p-4 rounded-lg glassmorphism shadow-sm border border-white/20 transition-opacity duration-300 ${isDisabled ? 'opacity-50' : ''}`}
                             >
+                              <button
+                                onClick={() => toggleEquipment(eq.id)}
+                                className={`mr-4 p-2 rounded-lg transition-all duration-200 ${
+                                  isDisabled
+                                    ? 'bg-gray-200 text-gray-400 hover:bg-gray-300'
+                                    : 'bg-green-100 text-green-600 hover:bg-green-200'
+                                }`}
+                                title={isDisabled ? 'Activer' : 'Désactiver'}
+                              >
+                                <Power className="w-4 h-4" />
+                              </button>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center space-x-2 mb-1">
-                                  <span className="font-semibold text-gray-900">{eq.name}</span>
+                                  <span className={`font-semibold ${isDisabled ? 'text-gray-400 line-through' : 'text-gray-900'}`}>{eq.name}</span>
                                   <Badge
                                     variant="outline"
                                     className="border-yellow-300 text-yellow-700 bg-yellow-50 text-xs"
                                   >
                                     {eq.type}
                                   </Badge>
+                                  {isDisabled && (
+                                    <Badge variant="outline" className="border-gray-300 text-gray-500 bg-gray-50 text-xs">
+                                      OFF
+                                    </Badge>
+                                  )}
                                 </div>
                                 <div className="flex justify-between text-sm mb-1">
                                   <span className="text-gray-600">
-                                    {Number(eq.currentConsumptionMw).toFixed(2)} / {eq.capacityMaxMw} MW
+                                    {isDisabled ? '0.00' : Number(eq.currentConsumptionMw).toFixed(2)} / {eq.capacityMaxMw} MW
                                   </span>
                                   <span className={`font-semibold ${eqColor.text}`}>{eqPercentage}%</span>
                                 </div>

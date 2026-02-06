@@ -26,6 +26,7 @@ router.get('/zones/:id', [ZonesController, 'show'])
 // Equipments
 router.get('/equipments', [EquipmentsController, 'index'])
 router.get('/equipments/:id', [EquipmentsController, 'show'])
+router.patch('/equipments/:id/toggle', [EquipmentsController, 'toggle'])
 
 // Power Readings
 router.get('/power-readings', [PowerReadingsController, 'index'])
