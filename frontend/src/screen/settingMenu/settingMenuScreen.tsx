@@ -42,11 +42,11 @@ export default function SettingMenuScreen() {
             </button>
 
             {isOpen && (
-                <div className="absolute top-full right-0 mt-2 min-w-[160px] bg-white px-2 py-2 rounded-xl shadow-xl border border-gray-200 z-[9999]" >
+                <div className="absolute top-full right-0 mt-2 min-w-40 bg-white px-2 py-2 rounded-xl shadow-xl border border-gray-200 z-9999" >
                     <ul className="space-y-1">
-                        <li className="text-gray-900 px-3 py-2 rounded-lg hover:bg-yellow-50 cursor-pointer transition-colors">Profile</li>
-                        <li className="text-gray-900 px-3 py-2 rounded-lg hover:bg-yellow-50 cursor-pointer transition-colors">Settings</li>
-                        <li className="text-gray-900 px-3 py-2 rounded-lg hover:bg-red-50 hover:text-red-600 cursor-pointer transition-colors">Logout</li>
+                        <li className="text-gray-900 px-3 py-2 rounded-lg hover:bg-yellow-200 cursor-pointer transition-colors">Profile</li>
+                        <li className="text-gray-900 px-3 py-2 rounded-lg hover:bg-yellow-200 cursor-pointer transition-colors">Settings</li>
+                        <li className="text-gray-900 px-3 py-2 rounded-lg hover:bg-red-200 hover:text-red-600 cursor-pointer transition-colors">Logout</li>
                     </ul>
                 </div>)
                 }
