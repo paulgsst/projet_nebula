@@ -1,8 +1,9 @@
-import { 
-  Droplets, 
-  Bell, 
-  Settings, 
-  User, 
+import { useState, useEffect } from 'react';
+import {
+  Droplets,
+  Bell,
+  Settings,
+  User,
   Zap,
   Clock,
   AlertTriangle,
@@ -13,11 +14,39 @@ import {
   Lightbulb,
   CloudLightning,
   LucideWeight,
-  AlertCircle
+  AlertCircle,
+  MapPin,
+  ChevronDown,
+  ChevronUp,
+  Cpu
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './../card/card';
 import { Badge } from './../../ui/badge';
 import { Progress } from './../../ui/progress';
+
+interface PowerReadingData {
+  id: number;
+  totalConsumptionMw: number;
+  totalCapacityMw: number;
+  createdAt: string;
+}
+
+interface EquipmentData {
+  id: number;
+  name: string;
+  zoneId: number;
+  type: string;
+  capacityMaxMw: number;
+  importanceWeight: number;
+  currentConsumptionMw: number;
+}
+
+interface ZoneData {
+  id: number;
+  name: string;
+  capacityMaxMw: number;
+  equipments: EquipmentData[];
+}
 
 export default function MainScreen() {
   // Mock data for demonstration
@@ -27,20 +56,22 @@ export default function MainScreen() {
   const lastUpdate = "2 mins ago";
 
   // Historical data for the line chart (last 24 hours)
-  const historicalData = [
-    { time: '00:00', level: 80 },
-    { time: '02:00', level: 78 },
-    { time: '04:00', level: 76 },
-    { time: '06:00', level: 74 },
-    { time: '08:00', level: 80 },
-    { time: '10:00', level: 81 },
-    { time: '12:00', level: 83 },
-    { time: '14:00', level: 79 },
-    { time: '16:00', level: 77 },
-    { time: '18:00', level: 75 },
-    { time: '20:00', level: 73 },
-    { time: '22:00', level: 75 },
-  ];
+  const [historicalData, setHistoricalData] = useState<{ time: string; level: number }[]>([]);
+
+  useEffect(() => {
+    fetch('http://localhost:3333/power-readings')
+      .then((res) => res.json())
+      .then((data: PowerReadingData[]) => {
+        const mapped = data.map((r) => ({
+          time: new Date(r.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+          level: r.totalCapacityMw > 0
+            ? Math.round((r.totalConsumptionMw / r.totalCapacityMw) * 100)
+            : 0,
+        }));
+        setHistoricalData(mapped);
+      })
+      .catch(() => setHistoricalData([]));
+  }, []);
 
   // Alerts data with proper color coding
   const alerts = [
@@ -67,12 +98,62 @@ export default function MainScreen() {
     }
   ];
 
+  // Zones data from API
+  const [zones, setZones] = useState<ZoneData[]>([]);
+  const [selectedZoneId, setSelectedZoneId] = useState<number | null>(null);
+  const [zonesLoading, setZonesLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('http://localhost:3333/zones')
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data)
+        setZones(data);
+        setZonesLoading(false);
+      })
+      .catch(() => setZonesLoading(false));
+  }, []);
+
+  const selectedZone = zones.find((z) => z.id === selectedZoneId) || null;
+
+  const getZoneConsumption = (zone: ZoneData) =>
+    zone.equipments.reduce((sum, eq) => sum + Number(eq.currentConsumptionMw), 0);
+
+  const getZonePercentage = (zone: ZoneData) => {
+    if (zone.capacityMaxMw === 0) return 0;
+    return Math.round((getZoneConsumption(zone) / zone.capacityMaxMw) * 100);
+  };
+
+  const getZoneColor = (percentage: number) => {
+    if (percentage >= 85) return { text: 'text-red-600', bg: 'bg-red-500', gradient: 'linear-gradient(135deg, #EF4444, #DC2626)', progress: '[&>div]:bg-red-500' };
+    if (percentage >= 70) return { text: 'text-orange-500', bg: 'bg-orange-500', gradient: 'linear-gradient(135deg, #F97316, #EA580C)', progress: '[&>div]:bg-orange-500' };
+    return { text: 'text-green-600', bg: 'bg-green-500', gradient: 'linear-gradient(135deg, #22C55E, #16A34A)', progress: '[&>div]:bg-green-500' };
+  };
+
+  const getEquipmentPercentage = (eq: EquipmentData) => {
+    if (eq.capacityMaxMw === 0) return 0;
+    return Math.round((Number(eq.currentConsumptionMw) / eq.capacityMaxMw) * 100);
+  };
+
+  const globalConsumption = zones.reduce((sum, z) => sum + getZoneConsumption(z), 0);
+  const globalCapacity = zones.reduce((sum, z) => sum + Number(z.capacityMaxMw), 0);
+  const globalPercentage = globalCapacity > 0 ? Math.round((globalConsumption / globalCapacity) * 100) : 0;
+  const globalColor = getZoneColor(globalPercentage);
+
   // Enhanced Circular Gauge Component with premium glow effect
   const CircularGauge = ({ value, size = 320 }: { value: number; size?: number }) => {
+    const clamped = Math.min(value, 100);
     const radius = size / 2 - 25;
     const circumference = 2 * Math.PI * radius;
     const strokeDasharray = circumference;
-    const strokeDashoffset = circumference - (value / 100) * circumference;
+    const strokeDashoffset = circumference - (clamped / 100) * circumference;
+    const gaugeColor = getZoneColor(value);
+
+    const colorStops = value >= 85
+      ? { start: '#DC2626', end: '#EF4444' }
+      : value >= 70
+      ? { start: '#EA580C', end: '#F97316' }
+      : { start: '#16A34A', end: '#22C55E' };
 
     return (
       <div className="flex items-center justify-center">
@@ -87,17 +168,15 @@ export default function MainScreen() {
                 </feMerge>
               </filter>
               <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ed9302" />
-                <stop offset="30%" stopColor="#ed9302" />
-                <stop offset="70%" stopColor="#fcb103" />
-                <stop offset="100%" stopColor="#ffc014" />
+                <stop offset="0%" stopColor={colorStops.start} />
+                <stop offset="100%" stopColor={colorStops.end} />
               </linearGradient>
               <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="rgba(59, 130, 246, 0.1)" />
                 <stop offset="100%" stopColor="rgba(147, 197, 253, 0.05)" />
               </linearGradient>
             </defs>
-            
+
             {/* Background circle */}
             <circle
               cx={size / 2}
@@ -107,7 +186,7 @@ export default function MainScreen() {
               strokeWidth="18"
               fill="transparent"
             />
-            
+
             {/* Progress circle with enhanced glow */}
             <circle
               cx={size / 2}
@@ -122,23 +201,23 @@ export default function MainScreen() {
               className="transition-all duration-1000 ease-out"
               filter="url(#glow)"
               style={{
-                filter: 'drop-shadow(0 0 20px rgba(250, 184, 7, 0.6))',
+                filter: `drop-shadow(0 0 20px ${colorStops.end}99)`,
               }}
             />
           </svg>
-          
+
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
-              <div className="text-6xl font-bold text-gray-900 mb-3 drop-shadow-sm">
+              <div className={`text-6xl font-bold mb-3 drop-shadow-sm ${gaugeColor.text}`}>
                 {value}%
               </div>
-              <div className="text-sm font-semibold text-yellow-400 uppercase tracking-widest mb-2">
+              <div className={`text-sm font-semibold uppercase tracking-widest mb-2 ${gaugeColor.text}`}>
                 Power Consumption
               </div>
               <div className="flex items-center justify-center space-x-2">
-                <Zap className="w-5 h-5 text-yellow-500" />
+                <Zap className={`w-5 h-5 ${gaugeColor.text}`} />
                 <span className="text-sm font-medium text-gray-600">
-                  {Math.round(maxPowerConsumption * value / 100)}W of {maxPowerConsumption}W
+                  {globalConsumption.toFixed(1)} MW / {globalCapacity} MW
                 </span>
               </div>
             </div>
@@ -404,11 +483,10 @@ export default function MainScreen() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-gray-900 mb-3">{currentPowerConsumption}%</div>
-              <Progress value={currentPowerConsumption} className="h-3 mb-3" />
-              <p className="text-sm text-gray-600 flex items-center">
-                <TrendingUp className="inline w-4 h-4 mr-1 text-green-500" />
-                +2% from yesterday
+              <div className={`text-4xl font-bold mb-3 ${globalColor.text}`}>{globalPercentage}%</div>
+              <Progress value={Math.min(globalPercentage, 100)} className={`h-3 mb-3 ${globalColor.progress}`} />
+              <p className="text-sm text-gray-600">
+                {globalConsumption.toFixed(1)} / {globalCapacity} MW
               </p>
             </CardContent>
           </Card>
@@ -428,10 +506,10 @@ export default function MainScreen() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-gray-900 mb-1">{maxPowerConsumption}W</div>
+              <div className="text-4xl font-bold text-gray-900 mb-1">{globalCapacity} MW</div>
               <p className="text-sm text-gray-600 mb-2">Total capacity</p>
               <p className="text-xs text-gray-600">
-                Current: <span className="font-semibold">{Math.round(maxPowerConsumption * currentPowerConsumption / 100)}W</span>
+                Current: <span className={`font-semibold ${globalColor.text}`}>{globalConsumption.toFixed(1)} MW</span>
               </p>
             </CardContent>
           </Card>
@@ -502,15 +580,19 @@ export default function MainScreen() {
             </CardHeader>
             <CardContent>
               <div className="h-80 flex items-center justify-center">
-                <CircularGauge value={currentPowerConsumption} />
+                <CircularGauge value={globalPercentage} />
               </div>
               <div className="text-center mt-6">
                 <p className="text-sm font-semibold text-gray-600 mb-3">Power Consumption Status</p>
-                <Badge 
-                  variant="outline" 
-                  className="border-yellow-300 text-yellow-700 bg-yellow-50 shadow-sm px-4 py-2 font-semibold"
+                <Badge
+                  variant="outline"
+                  className={`shadow-sm px-4 py-2 font-semibold ${
+                    globalPercentage >= 85 ? 'border-red-300 text-red-700 bg-red-50'
+                    : globalPercentage >= 70 ? 'border-orange-300 text-orange-700 bg-orange-50'
+                    : 'border-green-300 text-green-700 bg-green-50'
+                  }`}
                 >
-                  Normal Range
+                  {globalPercentage >= 85 ? 'Critical' : globalPercentage >= 70 ? 'Warning' : 'Normal Range'}
                 </Badge>
               </div>
             </CardContent>
@@ -529,6 +611,127 @@ export default function MainScreen() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Power by Zone Section */}
+        <Card className="glassmorphism shadow-xl hover:shadow-2xl transition-all duration-300 border-white/30 mb-8">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-gray-900 flex items-center">
+              <MapPin className="w-6 h-6 mr-3 text-yellow-500" />
+              Power Consumption by Zone
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {zonesLoading ? (
+              <div className="text-center py-8 text-gray-500">Loading zones...</div>
+            ) : zones.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">No zones found</div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {zones.map((zone) => {
+                    const consumption = getZoneConsumption(zone);
+                    const percentage = getZonePercentage(zone);
+                    const isSelected = selectedZoneId === zone.id;
+                    const color = getZoneColor(percentage);
+
+                    return (
+                      <div
+                        key={zone.id}
+                        onClick={() => setSelectedZoneId(isSelected ? null : zone.id)}
+                        className={`p-5 rounded-xl cursor-pointer transition-all duration-300 glassmorphism shadow-sm hover:shadow-lg border-2 ${
+                          isSelected
+                            ? 'border-yellow-400 bg-yellow-50/50 shadow-yellow-100'
+                            : 'border-white/20 hover:border-yellow-200'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center space-x-3">
+                            <div
+                              className="p-2 rounded-lg"
+                              style={{ background: color.gradient }}
+                            >
+                              <MapPin className="w-4 h-4 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="font-bold text-gray-900">{zone.name}</h3>
+                              <p className="text-xs text-gray-500">
+                                {zone.equipments.length} equipment{zone.equipments.length !== 1 ? 's' : ''}
+                              </p>
+                            </div>
+                          </div>
+                          {isSelected ? (
+                            <ChevronUp className="w-5 h-5 text-yellow-500" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5 text-gray-400" />
+                          )}
+                        </div>
+                        <div className="mb-2">
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="text-gray-600">{consumption.toFixed(2)} MW</span>
+                            <span className={`font-semibold ${color.text}`}>{percentage}%</span>
+                          </div>
+                          <Progress value={Math.min(percentage, 100)} className={`h-2 ${color.progress}`} />
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          Capacity: {zone.capacityMaxMw} MW
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Equipment details for selected zone */}
+                {selectedZone && (
+                  <div className="mt-6 p-5 rounded-xl glassmorphism border-2 border-yellow-200/50">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                      <Cpu className="w-5 h-5 mr-2 text-yellow-500" />
+                      Equipment in {selectedZone.name}
+                    </h3>
+                    {selectedZone.equipments.length === 0 ? (
+                      <p className="text-gray-500 text-sm">No equipment in this zone</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {selectedZone.equipments.map((eq) => {
+                          const eqPercentage = getEquipmentPercentage(eq);
+                          const eqColor = getZoneColor(eqPercentage);
+                          return (
+                            <div
+                              key={eq.id}
+                              className="flex items-center p-4 rounded-lg glassmorphism shadow-sm border border-white/20"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center space-x-2 mb-1">
+                                  <span className="font-semibold text-gray-900">{eq.name}</span>
+                                  <Badge
+                                    variant="outline"
+                                    className="border-yellow-300 text-yellow-700 bg-yellow-50 text-xs"
+                                  >
+                                    {eq.type}
+                                  </Badge>
+                                </div>
+                                <div className="flex justify-between text-sm mb-1">
+                                  <span className="text-gray-600">
+                                    {Number(eq.currentConsumptionMw).toFixed(2)} / {eq.capacityMaxMw} MW
+                                  </span>
+                                  <span className={`font-semibold ${eqColor.text}`}>{eqPercentage}%</span>
+                                </div>
+                                <Progress value={Math.min(eqPercentage, 100)} className={`h-1.5 ${eqColor.progress}`} />
+                              </div>
+                              <div className="ml-4 text-right shrink-0">
+                                <div className="text-xs text-gray-500">Weight</div>
+                                <div className="font-bold text-gray-900">{eq.importanceWeight}</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Alerts Panel with Modern List and Colored Status Tags */}
         <Card className="glassmorphism shadow-xl hover:shadow-2xl transition-all duration-300 border-white/30">

@@ -24,6 +24,9 @@ export default class Equipment extends BaseModel {
   @column()
   declare importanceWeight: number
 
+  @column()
+  declare currentConsumptionMw: number
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
