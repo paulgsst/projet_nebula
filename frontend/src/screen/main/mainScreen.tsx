@@ -21,8 +21,8 @@ import { Progress } from './../../ui/progress';
 
 export default function MainScreen() {
   // Mock data for demonstration
-  const currentPowerConsumption = 75;
-  const maxPowerConsumption = 1000;
+  const currentPowerConsumption = 75; //Percentage of current power consumption
+  const maxPowerConsumption = 10000;
   const pumpStatus = "ON";
   const lastUpdate = "2 mins ago";
 
@@ -431,7 +431,7 @@ export default function MainScreen() {
               <div className="text-4xl font-bold text-gray-900 mb-1">{maxPowerConsumption}W</div>
               <p className="text-sm text-gray-600 mb-2">Total capacity</p>
               <p className="text-xs text-gray-600">
-                Current: <span className="font-semibold">{Math.round(maxPowerConsumption * currentPowerConsumption / 100)}L</span>
+                Current: <span className="font-semibold">{Math.round(maxPowerConsumption * currentPowerConsumption / 100)}W</span>
               </p>
             </CardContent>
           </Card>
