@@ -9,7 +9,11 @@ import {
   CheckCircle,
   TrendingUp,
   Activity,
-  Thermometer
+  Thermometer,
+  Lightbulb,
+  CloudLightning,
+  LucideWeight,
+  AlertCircle
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './../card/card';
 import { Badge } from './../../ui/badge';
@@ -17,8 +21,8 @@ import { Progress } from './../../ui/progress';
 
 export default function MainScreen() {
   // Mock data for demonstration
-  const currentWaterLevel = 75;
-  const tankCapacity = 1000;
+  const currentPowerConsumption = 75;
+  const maxPowerConsumption = 1000;
   const pumpStatus = "ON";
   const lastUpdate = "2 mins ago";
 
@@ -28,10 +32,10 @@ export default function MainScreen() {
     { time: '02:00', level: 78 },
     { time: '04:00', level: 76 },
     { time: '06:00', level: 74 },
-    { time: '08:00', level: 70 },
-    { time: '10:00', level: 68 },
-    { time: '12:00', level: 72 },
-    { time: '14:00', level: 75 },
+    { time: '08:00', level: 80 },
+    { time: '10:00', level: 81 },
+    { time: '12:00', level: 83 },
+    { time: '14:00', level: 79 },
     { time: '16:00', level: 77 },
     { time: '18:00', level: 75 },
     { time: '20:00', level: 73 },
@@ -64,7 +68,7 @@ export default function MainScreen() {
   ];
 
   // Enhanced Circular Gauge Component with premium glow effect
-  const CircularGauge = ({ value, size = 220 }: { value: number; size?: number }) => {
+  const CircularGauge = ({ value, size = 320 }: { value: number; size?: number }) => {
     const radius = size / 2 - 25;
     const circumference = 2 * Math.PI * radius;
     const strokeDasharray = circumference;
@@ -83,10 +87,10 @@ export default function MainScreen() {
                 </feMerge>
               </filter>
               <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#60A5FA" />
-                <stop offset="30%" stopColor="#3B82F6" />
-                <stop offset="70%" stopColor="#2563EB" />
-                <stop offset="100%" stopColor="#1D4ED8" />
+                <stop offset="0%" stopColor="#ed9302" />
+                <stop offset="30%" stopColor="#ed9302" />
+                <stop offset="70%" stopColor="#fcb103" />
+                <stop offset="100%" stopColor="#ffc014" />
               </linearGradient>
               <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="rgba(59, 130, 246, 0.1)" />
@@ -118,7 +122,7 @@ export default function MainScreen() {
               className="transition-all duration-1000 ease-out"
               filter="url(#glow)"
               style={{
-                filter: 'drop-shadow(0 0 20px rgba(59, 130, 246, 0.6))',
+                filter: 'drop-shadow(0 0 20px rgba(250, 184, 7, 0.6))',
               }}
             />
           </svg>
@@ -128,13 +132,13 @@ export default function MainScreen() {
               <div className="text-6xl font-bold text-gray-900 mb-3 drop-shadow-sm">
                 {value}%
               </div>
-              <div className="text-sm font-semibold text-blue-600 uppercase tracking-widest mb-2">
-                Water Level
+              <div className="text-sm font-semibold text-yellow-400 uppercase tracking-widest mb-2">
+                Power Consumption
               </div>
               <div className="flex items-center justify-center space-x-2">
-                <Droplets className="w-5 h-5 text-blue-500" />
+                <Zap className="w-5 h-5 text-yellow-500" />
                 <span className="text-sm font-medium text-gray-600">
-                  {Math.round(tankCapacity * value / 100)}L of {tankCapacity}L
+                  {Math.round(maxPowerConsumption * value / 100)}W of {maxPowerConsumption}W
                 </span>
               </div>
             </div>
@@ -191,9 +195,9 @@ export default function MainScreen() {
         >
           <defs>
             <linearGradient id="chartAreaGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(59, 130, 246, 0.4)" />
-              <stop offset="50%" stopColor="rgba(59, 130, 246, 0.2)" />
-              <stop offset="100%" stopColor="rgba(59, 130, 246, 0.0)" />
+              <stop offset="0%" stopColor="rgba(255, 192, 20, 0.4)" />
+              <stop offset="50%" stopColor="rgba(255, 192, 20, 0.2)" />
+              <stop offset="100%" stopColor="rgba(255, 192, 20, 0.0)" />
             </linearGradient>
             <filter id="chartLineGlow" x="-50%" y="-50%" width="200%" height="200%">
               <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
@@ -214,7 +218,7 @@ export default function MainScreen() {
                   y1={y}
                   x2={width - padding}
                   y2={y}
-                  stroke="rgba(59, 130, 246, 0.12)"
+                  stroke="rgba(255, 192, 20, 0.12)"
                   strokeDasharray="6,12"
                   strokeWidth="1"
                 />
@@ -262,7 +266,7 @@ export default function MainScreen() {
           <path
             d={smoothPath}
             fill="none"
-            stroke="#3B82F6"
+            stroke="#ffc014"
             strokeWidth="5"
             filter="url(#chartLineGlow)"
             style={{
@@ -280,12 +284,12 @@ export default function MainScreen() {
                   cx={x}
                   cy={y}
                   r="7"
-                  fill="#3B82F6"
+                  fill="#ffc014"
                   stroke="white"
                   strokeWidth="4"
                   className="hover:r-9 transition-all cursor-pointer"
                   style={{
-                    filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.4))',
+                    filter: 'drop-shadow(0 0 8px rgba(255, 192, 20, 0.4))',
                   }}
                 />
                 <title>{`${item.time}: ${item.level}%`}</title>
@@ -343,25 +347,25 @@ export default function MainScreen() {
             <div 
               className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"
               style={{
-                background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)',
+                background: 'linear-gradient(135deg, #fab807, #fab807)',
                 boxShadow: '0 8px 20px rgba(59, 130, 246, 0.3)',
               }}
             >
-              <Droplets className="w-7 h-7 text-white" />
+              <Zap className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Water Level Monitor</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Power Consumption Monitor</h1>
               <p className="text-sm text-gray-600 hidden sm:block">IoT-Based Monitoring System</p>
             </div>
           </div>
           
           {/* Right side - Profile, notifications, and user info */}
           <div className="flex items-center space-x-4">
-            <button className="relative p-3 text-gray-600 hover:text-blue-600 transition-colors rounded-full hover:bg-blue-50">
+            <button className="relative p-3 text-white hover:text-yellow-500 transition-colors rounded-full hover:bg-yellow-50">
               <Bell className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">2</span>
             </button>
-            <button className="p-3 text-gray-600 hover:text-blue-600 transition-colors rounded-full hover:bg-blue-50">
+            <button className="p-3 text-white hover:text-yellow-500 transition-colors rounded-full hover:bg-yellow-50">
               <Settings className="w-5 h-5" />
             </button>
             <div className="flex items-center space-x-3 pl-4 border-l border-gray-200">
@@ -386,23 +390,22 @@ export default function MainScreen() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative z-10">
         {/* Four Premium KPI Cards with Glassmorphism Effects */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Current Water Level Card */}
           <Card className="glassmorphism shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 border-white/30">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-semibold text-gray-700">Current Water Level</CardTitle>
+              <CardTitle className="text-sm font-semibold text-gray-700">Current Power Consumption</CardTitle>
               <div 
                 className="p-3 rounded-xl shadow-lg"
                 style={{
-                  background: 'linear-gradient(135deg, #3B82F6, #60A5FA)',
-                  boxShadow: '0 6px 16px rgba(59, 130, 246, 0.3)',
+                  background: 'linear-gradient(135deg, #ffc014, #ed9302)',
+                  boxShadow: '0 6px 16px rgba(255, 192, 20, 0.3)',
                 }}
               >
-                <Droplets className="h-5 w-5 text-white" />
+                <Zap className="h-5 w-5 text-white" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-gray-900 mb-3">{currentWaterLevel}%</div>
-              <Progress value={currentWaterLevel} className="h-3 mb-3" />
+              <div className="text-4xl font-bold text-gray-900 mb-3">{currentPowerConsumption}%</div>
+              <Progress value={currentPowerConsumption} className="h-3 mb-3" />
               <p className="text-sm text-gray-600 flex items-center">
                 <TrendingUp className="inline w-4 h-4 mr-1 text-green-500" />
                 +2% from yesterday
@@ -413,7 +416,7 @@ export default function MainScreen() {
           {/* Tank Capacity Card */}
           <Card className="glassmorphism shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 border-white/30">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-semibold text-gray-700">Tank Capacity</CardTitle>
+              <CardTitle className="text-sm font-semibold text-gray-700">Maximum Power Consumption</CardTitle>
               <div 
                 className="p-3 rounded-xl shadow-lg"
                 style={{
@@ -425,10 +428,10 @@ export default function MainScreen() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-gray-900 mb-1">{tankCapacity}L</div>
+              <div className="text-4xl font-bold text-gray-900 mb-1">{maxPowerConsumption}W</div>
               <p className="text-sm text-gray-600 mb-2">Total capacity</p>
               <p className="text-xs text-gray-600">
-                Current: <span className="font-semibold">{Math.round(tankCapacity * currentWaterLevel / 100)}L</span>
+                Current: <span className="font-semibold">{Math.round(maxPowerConsumption * currentPowerConsumption / 100)}L</span>
               </p>
             </CardContent>
           </Card>
@@ -440,11 +443,11 @@ export default function MainScreen() {
               <div 
                 className="p-3 rounded-xl shadow-lg"
                 style={{
-                  background: 'linear-gradient(135deg, #F59E0B, #FBBF24)',
+                  background: 'linear-gradient(135deg, #ffffff, #ffffff)',
                   boxShadow: '0 6px 16px rgba(245, 158, 11, 0.3)',
                 }}
               >
-                <Zap className="h-5 w-5 text-white" />
+                <Lightbulb className="h-5 w-5 text-yellow-500" />
               </div>
             </CardHeader>
             <CardContent>
@@ -493,19 +496,19 @@ export default function MainScreen() {
           <Card className="xl:col-span-1 glassmorphism shadow-xl hover:shadow-2xl transition-all duration-300 border-white/30">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-gray-900 flex items-center">
-                <Droplets className="w-6 h-6 mr-3 text-blue-600" />
+                <Zap className="w-6 h-6 mr-3 text-yellow-500" />
                 Current Level
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-80 flex items-center justify-center">
-                <CircularGauge value={currentWaterLevel} />
+                <CircularGauge value={currentPowerConsumption} />
               </div>
               <div className="text-center mt-6">
-                <p className="text-sm font-semibold text-gray-600 mb-3">Water Level Status</p>
+                <p className="text-sm font-semibold text-gray-600 mb-3">Power Consumption Status</p>
                 <Badge 
                   variant="outline" 
-                  className="border-blue-300 text-blue-700 bg-blue-50 shadow-sm px-4 py-2 font-semibold"
+                  className="border-yellow-300 text-yellow-700 bg-yellow-50 shadow-sm px-4 py-2 font-semibold"
                 >
                   Normal Range
                 </Badge>
@@ -517,8 +520,8 @@ export default function MainScreen() {
           <Card className="xl:col-span-2 glassmorphism shadow-xl hover:shadow-2xl transition-all duration-300 border-white/30">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-gray-900 flex items-center">
-                <TrendingUp className="w-6 h-6 mr-3 text-blue-600" />
-                24-Hour Water Level History
+                <TrendingUp className="w-6 h-6 mr-3 text-yellow-500" />
+                24-Hour Power Consumption History
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -531,7 +534,7 @@ export default function MainScreen() {
         <Card className="glassmorphism shadow-xl hover:shadow-2xl transition-all duration-300 border-white/30">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-gray-900 flex items-center">
-              <Bell className="w-6 h-6 mr-3 text-blue-600" />
+              <Bell className="w-6 h-6 mr-3 text-yellow-500" />
               Recent Alerts & Notifications
             </CardTitle>
           </CardHeader>
@@ -544,18 +547,21 @@ export default function MainScreen() {
                 >
                   <div className="shrink-0 mt-1">
                     {alert.type === 'danger' && (
-                      <div className="p-3 rounded-full bg-red-100 border-2 border-red-200 shadow-md">
+                      <div className="p-3 w-37.5 flex flex-col items-center rounded-full bg-red-100 border-2 border-red-200 shadow-md">
                         <AlertTriangle className="w-5 h-5 text-red-600" />
+                        <div className='text-red-600'>Critical error</div>                        
                       </div>
                     )}
                     {alert.type === 'warning' && (
-                      <div className="p-3 rounded-full bg-orange-100 border-2 border-orange-200 shadow-md">
-                        <AlertTriangle className="w-5 h-5 text-orange-600" />
+                      <div className="p-3 w-37.5 flex flex-col items-center rounded-full bg-orange-100 border-2 border-orange-200 shadow-md">
+                        <AlertCircle className="w-5 h-5 text-orange-600" />
+                        <div className='text-orange-600'>Warning</div>
                       </div>
                     )}
                     {alert.type === 'info' && (
-                      <div className="p-3 rounded-full bg-blue-100 border-2 border-blue-200 shadow-md">
-                        <Bell className="w-5 h-5 text-blue-600" />
+                      <div className="p-3 w-37.5 flex flex-col items-center rounded-full bg-blue-100 border-2 border-blue-200 shadow-md">
+                        <Bell className="w-5 h-5 flex justify-center text-blue-600" />
+                        <div className='text-blue-600'>Info</div>
                       </div>
                     )}
                   </div>
@@ -581,7 +587,7 @@ export default function MainScreen() {
               ))}
             </div>
             <div className="mt-6 text-center">
-              <button className="text-sm font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 px-6 py-3 rounded-full transition-colors hover:bg-blue-100 border-2 border-blue-200">
+              <button className="text-sm font-semibold text-yellow-600 hover:text-yellow-800 bg-yellow-50 px-6 py-3 rounded-full transition-colors hover:bg-yellow-100 border-2 border-yellow-200">
                 View all alerts →
               </button>
             </div>
@@ -593,7 +599,7 @@ export default function MainScreen() {
       <footer className="bg-white/40 backdrop-blur-md border-t border-white/30 px-4 sm:px-6 py-6 mt-8">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-sm font-semibold text-gray-700">
-            © 2025 Water Level Monitor — <span className="font-bold text-blue-600">Idris Ogundele Olawale</span> | Matric No: <span className="font-bold text-blue-600">222956</span>
+            © 2025 Power Consumption Monitor — <span className="font-bold text-yellow-600">Idris Ogundele Olawale</span> | Matric No: <span className="font-bold text-yellow-600">222956</span>
           </p>
         </div>
       </footer>
